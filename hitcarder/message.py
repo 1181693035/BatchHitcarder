@@ -4,6 +4,9 @@ Author: Tishacy
 """
 import json
 from abc import ABC, abstractmethod
+from email.mime.text import MIMEText
+from email.header import Header
+from smtplib import SMTP_SSL
 
 import requests
 from loguru import logger
@@ -70,6 +73,51 @@ class PushPlusMessageSender(BaseMessageSender):
         return "<PushPlusMessageSender>"
 
 
+class MailMessageSender(BaseMessageSender):
+    """Mail message sender"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.host_server = kwargs.get("host_server")
+        self.password = kwargs.get("password")
+        self.sender = kwargs.get("sender")
+        self.receiver = kwargs.get("receiver")
+        self.template = kwargs.get("template", "html")
+        self._smtp = self._init_smtp()
+
+    def _init_smtp(self):
+        username = self.sender.split("@")[0] if 'qq' in self.sender else self.sender
+        smtp = SMTP_SSL(self.host_server)
+        smtp.set_debuglevel(1)
+        smtp.ehlo(self.host_server)
+        smtp.login(username, self.password)
+        return smtp
+
+    def send(self, data):
+        if not isinstance(data, dict):
+            raise ValueError("data must be a dict, got a %s type." % type(data))
+
+        title = data.get('title', '')[:100]
+        content = data.get('content', '')
+        email = MIMEText(content, self.template, 'utf-8')
+        email["Subject"] = Header(title, 'utf-8')
+        email["From"] = self.sender
+        email["To"] = self.receiver
+
+        res = self._smtp.sendmail(self.sender, self.receiver, email.as_string())
+        if len(res.keys()) == 0:
+            logger.info("Send the push plus message.")
+            return True
+        logger.warning("Failed to send the push plus message: %s" % content)
+        return False
+
+    def close(self):
+        self._smtp.quit()
+
+    def __repr__(self):
+        return "<MailMessageSender>"
+
+
 msg_sender_mapper = {
-    'wechat': PushPlusMessageSender
+    'wechat': PushPlusMessageSender,
+    'mail': MailMessageSender
 }
