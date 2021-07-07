@@ -1,0 +1,25 @@
+{
+    "tasks": [{
+        "username": "你的浙大统一认证平台用户名",
+        "password": "你的浙大统一认证平台密码",
+        "schedule": {
+            "hour": 6,
+            "minute": 5,
+            "rand_delay": 4
+        },
+        "run_immediate": true,
+        "msg_senders": [{
+            "type": "wechat",
+            "init_args": {
+                "token": "你的 PushPlus token",
+                "template": "html"
+            }
+        }]
+    }],
+    "log": {
+        "logfile_name": "default.log",
+        "rotation": "16MB",
+        "encoding": "utf-8",
+        "retention": "10 days"
+    }
+}
