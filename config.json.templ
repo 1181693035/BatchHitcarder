@@ -1,7 +1,7 @@
 {
     "tasks": [{
-        "username": "你的浙大统一认证平台用户名",
-        "password": "你的浙大统一认证平台密码",
+        "username": "<你的浙大统一认证平台用户名>",
+        "password": "<你的浙大统一认证平台密码>",
         "schedule": {
             "hour": 6,
             "minute": 5,
@@ -11,8 +11,15 @@
         "msg_senders": [{
             "type": "wechat",
             "init_args": {
-                "token": "你的 PushPlus token",
-                "template": "html"
+                "token": "<你的 PushPlus token>",
+            }
+        },{
+            "type": "mail",
+            "init_args": {
+                "host_server": "<你的 SMTP server>",
+                "password": "<你的 SMTP 服务密码>",
+                "sender": "<发件人邮箱>",
+                "receiver": "<收件人邮箱>"
             }
         }]
     }],
