@@ -151,7 +151,7 @@ class HitCarder(object):
                               % (self.status, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         else:
             data['title'] = '[%s 同学] 打卡失败！' % (self.info.get('name', self.username))
-            data['content'] = '❌ 打卡失败！</br>最终打卡状态: %s</br>打卡时间 %s' \
+            data['content'] = '❌ 打卡失败！请手动打卡~</br>最终打卡状态: %s</br>打卡时间 %s' \
                               % (self.status, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         for msg_sender in self.msg_senders:
             status = msg_sender.send(data)
