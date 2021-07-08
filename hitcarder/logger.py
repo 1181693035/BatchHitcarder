@@ -18,9 +18,13 @@ def log_init(conf_fpath=None):
     configs = json.loads(open(conf_fpath, 'r').read())
 
     log_config = configs.get('log', {})
-    logger.add(os.path.join(package_dir, "log", log_config.get('logfile_name', "default.log")),
+    log_fpath = os.path.abspath(log_config.get('log_fpath', "./log/default.log"))
+    log_dir = os.path.dirname(log_fpath)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    logger.add(log_fpath,
                rotation=log_config.get('rotation'),
                encoding=log_config.get('encoding'),
                enqueue=True,
                retention=log_config.get('retention'))
-    logger.info("Logging initialized.")
+    logger.info("Logging initialized: %s" % log_fpath)
