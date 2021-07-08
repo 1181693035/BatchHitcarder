@@ -17,16 +17,37 @@ from hitcarder.logger import log_init
 
 def main():
     parser = argparse.ArgumentParser("Command line tool to run Hitcard tasks.")
-    parser.add_argument('-c', '--config', help="config file path")
+    parser.add_argument('-g', '--generate-config', help="Generate config file with the given file path, "
+                                                        "which is a json file.")
+    parser.add_argument('-c', '--config', help="Config file path.")
     args = parser.parse_args()
 
+    # Generate config file.
+    if args.generate_config:
+        conf_fpath = os.path.abspath(args.generate_config)
+        if not os.path.exists(os.path.dirname(conf_fpath)):
+            os.makedirs(os.path.dirname(conf_fpath))
+
+        conf_template_dir = os.path.dirname(os.path.abspath(__file__))
+        conf_template_fpath = os.path.join(conf_template_dir, 'config.json.templ')
+        if not os.path.exists(conf_template_fpath):
+            print("[Error] No config template file is found.")
+            return
+
+        with open(conf_fpath, 'w', encoding='utf-8') as f:
+            f.write(open(conf_template_fpath, 'r', encoding='utf-8').read())
+        print("[Info] Config file is generated: %s" % os.path.abspath(conf_fpath))
+        return
+
+    # Specify the config file.
     if args.config:
-        conf_fpath = args.config
+        conf_fpath = os.path.abspath(args.config)
     else:
         conf_dir = os.path.dirname(os.path.abspath(__file__))
         conf_fpath = os.path.join(conf_dir, 'config.json')
 
     # Load configs.
+    logger.info("Load config file: %s." % conf_fpath)
     log_init(conf_fpath)
     if not os.path.exists(conf_fpath):
         logger.error("No config file is found.")
@@ -35,7 +56,6 @@ def main():
     if 'tasks' not in configs:
         logger.error("No tasks found in the config file.")
         return
-    logger.info("Load config file: %s." % conf_fpath)
 
     scheduler = BlockingScheduler()
     tasks = configs['tasks']
