@@ -10,9 +10,9 @@ from threading import Thread
 from loguru import logger
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from hitcarder.base import task_flow
-from hitcarder.message import msg_sender_mapper, PushPlusMessageSender
-from hitcarder.logger import log_init
+from .base import task_flow
+from .message import msg_sender_mapper, PushPlusMessageSender
+from .logger import log_init
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         if not os.path.exists(os.path.dirname(conf_fpath)):
             os.makedirs(os.path.dirname(conf_fpath))
 
-        conf_template_dir = os.path.dirname(os.path.abspath(__file__))
+        conf_template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'template')
         conf_template_fpath = os.path.join(conf_template_dir, 'config.json.templ')
         if not os.path.exists(conf_template_fpath):
             print("[Error] No config template file is found.")
@@ -43,8 +43,8 @@ def main():
     if args.config:
         conf_fpath = os.path.abspath(args.config)
     else:
-        conf_dir = os.path.dirname(os.path.abspath(__file__))
-        conf_fpath = os.path.join(conf_dir, 'config.json')
+        conf_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        conf_fpath = os.path.join(conf_dir, '../config.json')
 
     # Load configs.
     logger.info("Load config file: %s." % conf_fpath)
