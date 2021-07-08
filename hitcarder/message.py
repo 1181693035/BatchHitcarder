@@ -61,9 +61,7 @@ class PushPlusMessageSender(BaseMessageSender):
         }
         res = self._sess.post(self.push_plus_url, data=json.dumps(send_data)).json()
         if res["code"] == 200:
-            logger.info("Send the push plus message.")
             return True
-        logger.warning("Failed to send the push plus message: %s" % send_data)
         return False
 
     def close(self):
@@ -105,9 +103,7 @@ class MailMessageSender(BaseMessageSender):
 
         res = self._smtp.sendmail(self.sender, self.receiver, email.as_string())
         if len(res.keys()) == 0:
-            logger.info("Send the push plus message.")
             return True
-        logger.warning("Failed to send the push plus message: %s" % content)
         return False
 
     def close(self):

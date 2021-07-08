@@ -7,6 +7,7 @@ import json
 import time
 import random
 import datetime
+import traceback
 
 import requests
 from loguru import logger
@@ -64,6 +65,7 @@ class HitCarder(object):
 
         # check if login successfully
         if '统一身份认证' in res.content.decode():
+            self.status = "FAILED_LOGIN"
             raise LoginError('Login failed. Please check your ZJU username and password.')
         logger.info("Successfully login for %s." % self.username)
         self.status = "LOGINED"
@@ -87,6 +89,7 @@ class HitCarder(object):
             if len(old_infos) != 0:
                 old_info = json.loads(old_infos[0])
             else:
+                self.status = "NO_CACHE"
                 raise RegexMatchError("No cache info is found. Please manually hit card once before running this script.")
 
             new_info_tmp = json.loads(re.findall(r'def = ({[^\n]+})', html)[0])
@@ -94,8 +97,10 @@ class HitCarder(object):
             name = re.findall(r'realname: "([^\"]+)",', html)[0]
             number = re.findall(r"number: '([^\']+)',", html)[0]
         except IndexError as err:
+            self.status = "NO_CACHE"
             raise RegexMatchError('No hit card info is found in html with regex: ' + str(err))
         except json.decoder.JSONDecodeError as err:
+            self.status = "DECODE_ERROR"
             raise DecodeError('JSON decode error: ' + str(err))
 
         new_info = old_info.copy()
@@ -132,7 +137,7 @@ class HitCarder(object):
             return True
         except Exception as e:
             logger.warning("Failed to submit the hit card info for %s-%s: %s." % (self.username, info['name'], e))
-            self.status = "FAILED"
+            self.status = "FAILED_SUBMIT"
             return False
 
     def send_msgs(self, submit_success):
@@ -150,8 +155,12 @@ class HitCarder(object):
                               % (self.status, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         for msg_sender in self.msg_senders:
             status = msg_sender.send(data)
-            logger.info("%s Send a hit card message to %s, send status: %s, hit card status: %s"
-                        % (msg_sender, self.info.get('name', self.username), status, self.status))
+            if status:
+                logger.info("%s send a hit card message to %s, hit card status: %s"
+                            % (msg_sender, self.info.get('name', self.username), self.status))
+            else:
+                logger.warning("%s failed to send a hit card message to %s, hit card status: %s"
+                               % (msg_sender, self.info.get('name', self.username), self.status))
 
 
 def task_flow(username, password, rand_delay=1200, msg_senders=None):
@@ -177,6 +186,8 @@ def task_flow(username, password, rand_delay=1200, msg_senders=None):
         carder.login()
         is_success = carder.submit()
         carder.send_msgs(is_success)
-    except Exception:
+    except Exception as e:
+        logger.warning("Task flow error: " + str(e))
+        traceback.print_exc()
         carder.send_msgs(False)
     return is_success

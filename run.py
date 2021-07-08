@@ -4,6 +4,7 @@ Author: Tishacy
 """
 import os
 import json
+import argparse
 from threading import Thread
 
 from loguru import logger
@@ -15,10 +16,18 @@ from hitcarder.logger import log_init
 
 
 def main():
+    parser = argparse.ArgumentParser("Command line tool to run Hitcard tasks.")
+    parser.add_argument('-c', '--config', help="config file path")
+    args = parser.parse_args()
+
+    if args.config:
+        conf_fpath = args.config
+    else:
+        conf_dir = os.path.dirname(os.path.abspath(__file__))
+        conf_fpath = os.path.join(conf_dir, 'config.json')
+
     # Load configs.
-    log_init()
-    conf_dir = os.path.dirname(os.path.abspath(__file__))
-    conf_fpath = os.path.join(conf_dir, 'config.json')
+    log_init(conf_fpath)
     if not os.path.exists(conf_fpath):
         logger.error("No config file is found.")
         return

@@ -8,10 +8,10 @@ import json
 from loguru import logger
 
 
-def log_init():
+def log_init(conf_fpath=None):
     """Initializing logger settings."""
     package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    conf_fpath = os.path.join(package_dir, 'config.json')
+    conf_fpath = conf_fpath or os.path.join(package_dir, 'config.json')
     if not os.path.exists(conf_fpath):
         logger.error("No config file is found.")
         return
