@@ -10,3 +10,4 @@ dist
 *config.json
 *.service
 *.sh
+DEPLOYMENT.md
