@@ -14,6 +14,8 @@ $ hitcarder -g myconfig.json
 # Modify the config file.
 $ vim myconfig.json
 {
+    # Each task is a dict in 'tasks' list as below.
+    # Your could specify multiple tasks for more than one person.
     "tasks": [{
         # Specify your ZJU login information. 
         "username": "<你的浙大统一认证平台用户名>",
