@@ -80,7 +80,7 @@ class MailMessageSender(BaseMessageSender):
         self.sender = kwargs.get("sender")
         self.receiver = kwargs.get("receiver")
         self.template = kwargs.get("template", "html")
-        self._smtp = self._init_smtp()
+        self._smtp = None
 
     def _init_smtp(self):
         username = self.sender.split("@")[0] if 'qq' in self.sender else self.sender
@@ -101,13 +101,16 @@ class MailMessageSender(BaseMessageSender):
         email["From"] = self.sender
         email["To"] = self.receiver
 
+        self._smtp = self._init_smtp()
         res = self._smtp.sendmail(self.sender, self.receiver, email.as_string())
+        self._smtp.quit()
         if len(res.keys()) == 0:
             return True
         return False
 
     def close(self):
-        self._smtp.quit()
+        if self._smtp is not None:
+            self._smtp.quit()
 
     def __repr__(self):
         return "<MailMessageSender>"
