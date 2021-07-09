@@ -154,13 +154,18 @@ class HitCarder(object):
             data['content'] = '❌ 打卡失败！请手动打卡~</br>最终打卡状态: %s</br>打卡时间 %s' \
                               % (self.status, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         for msg_sender in self.msg_senders:
-            status = msg_sender.send(data)
-            if status:
-                logger.info("%s send a hit card message to %s, hit card status: %s"
-                            % (msg_sender, self.info.get('name', self.username), self.status))
-            else:
-                logger.warning("%s failed to send a hit card message to %s, hit card status: %s"
-                               % (msg_sender, self.info.get('name', self.username), self.status))
+            try:
+                status = msg_sender.send(data)
+                if status:
+                    logger.info("%s send a hit card message to %s, hit card status: %s"
+                                % (msg_sender, self.info.get('name', self.username), self.status))
+                else:
+                    logger.warning("%s failed to send a hit card message to %s, hit card status: %s"
+                                   % (msg_sender, self.info.get('name', self.username), self.status))
+            except Exception as e:
+                logger.warning("%s failed to send a hit card message to %s, hit card status: %s, Error msg: %s"
+                               % (msg_sender, self.info.get('name', self.username), self.status, e))
+                traceback.print_exc()
 
 
 def task_flow(username, password, rand_delay=1200, msg_senders=None):
@@ -185,9 +190,8 @@ def task_flow(username, password, rand_delay=1200, msg_senders=None):
     try:
         carder.login()
         is_success = carder.submit()
-        carder.send_msgs(is_success)
     except Exception as e:
         logger.warning("Task flow error: " + str(e))
         traceback.print_exc()
-        carder.send_msgs(False)
+    carder.send_msgs(is_success)
     return is_success
