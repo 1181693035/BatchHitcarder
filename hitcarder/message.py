@@ -9,7 +9,6 @@ from email.header import Header
 from smtplib import SMTP_SSL
 
 import requests
-from loguru import logger
 
 
 class BaseMessageSender(ABC):
@@ -113,7 +112,7 @@ class MailMessageSender(BaseMessageSender):
             self._smtp.quit()
 
     def __repr__(self):
-        return "<MailMessageSender>"
+        return "<MailMessageSender → %s>" % self.receiver
 
 
 msg_sender_mapper = {

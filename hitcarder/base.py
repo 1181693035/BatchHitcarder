@@ -37,7 +37,7 @@ class HitCarder(object):
         self.sess = self._init_sess()
         self.info = {}
         self.status = "INITIALIZED"
-        logger.info("HitCarder instance for %s is created." % self.username)
+        logger.info("%s HitCarder instance is created." % self)
 
     @staticmethod
     def _init_sess():
@@ -67,7 +67,7 @@ class HitCarder(object):
         if '统一身份认证' in res.content.decode():
             self.status = "FAILED_LOGIN"
             raise LoginError('Login failed. Please check your ZJU username and password.')
-        logger.info("Successfully login for %s." % self.username)
+        logger.info("%s Successfully logined." % self)
         self.status = "LOGINED"
         return self.sess
 
@@ -114,7 +114,7 @@ class HitCarder(object):
         new_info['jcqzrq'] = ""
         new_info['gwszdd'] = ""
         new_info['szgjcs'] = ""
-        logger.info("Successfully get submit info for %s-%s" % (self.username, name))
+        logger.info("%s Successfully get submit info." % self)
         self.info = new_info
         self.status = "GOT_INFO"
         return new_info
@@ -129,14 +129,14 @@ class HitCarder(object):
             res = self.sess.post(self._save_url, data=info)
             res_json = json.loads(res.text)
             if str(res_json['e']) == '0':
-                logger.info("Successfully hit card for %s-%s." % (self.username, info['name']))
+                logger.info("%s Successfully hit card." % self)
                 self.status = "COMPLETE"
                 return True
-            logger.info("Hit card info is already submitted today.")
+            logger.info("%s Hit card info is already submitted today." % self)
             self.status = "ALREADY_COMPLETE"
             return True
         except Exception as e:
-            logger.warning("Failed to submit the hit card info for %s-%s: %s." % (self.username, info['name'], e))
+            logger.warning("%s Failed to submit the hit card info: %s." % (self, e))
             self.status = "FAILED_SUBMIT"
             return False
 
@@ -157,15 +157,20 @@ class HitCarder(object):
             try:
                 status = msg_sender.send(data)
                 if status:
-                    logger.info("%s send a hit card message to %s, hit card status: %s"
-                                % (msg_sender, self.info.get('name', self.username), self.status))
+                    logger.info("%s %s send a hit card message to you, hit card status: %s"
+                                % (self, msg_sender, self.status))
                 else:
-                    logger.warning("%s failed to send a hit card message to %s, hit card status: %s"
-                                   % (msg_sender, self.info.get('name', self.username), self.status))
+                    logger.warning("%s %s failed to send a hit card message to you, hit card status: %s"
+                                   % (self, msg_sender, self.status))
             except Exception as e:
-                logger.warning("%s failed to send a hit card message to %s, hit card status: %s, Error msg: %s"
-                               % (msg_sender, self.info.get('name', self.username), self.status, e))
+                logger.warning("%s %s failed to send a hit card message to you, hit card status: %s, Error msg: %s"
+                               % (self, msg_sender, self.status, e))
                 traceback.print_exc()
+
+    def __repr__(self):
+        if self.info.get('name'):
+            return "[Hitcarder-%s-%s]" % (self.username, self.info.get('name'))
+        return "[Hitcarder-%s]" % self.username
 
 
 def task_flow(username, password, rand_delay=1200, msg_senders=None):
@@ -179,13 +184,14 @@ def task_flow(username, password, rand_delay=1200, msg_senders=None):
     if msg_senders is None:
         msg_senders = []
 
+    carder = HitCarder(username, password, msg_senders)
+
     # Random delay the task to mimic human behavior.
     sleep_time = random.randint(0, rand_delay)
-    logger.info("Task will be delayed %d seconds." % sleep_time)
+    logger.info("%s Task will be delayed %d seconds." % (carder, sleep_time))
     time.sleep(sleep_time)
 
     # Login and hit card.
-    carder = HitCarder(username, password, msg_senders)
     is_success = False
     try:
         carder.login()
