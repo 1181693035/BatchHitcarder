@@ -1,11 +1,16 @@
 import setuptools
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setuptools.setup(
     name="zju_hitcarder",
-    version="0.1.0",
+    version="0.1.1",
     author="Tishacy",
     author_email="Tishacy@gmail.com",
     description="ZJU health hitcarder",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
