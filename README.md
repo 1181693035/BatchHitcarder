@@ -49,7 +49,7 @@ Commands:
   run         Run ZJU Hitcard tasks with the given configs.
 
 $ hitcarder --version
-1.0.0
+1.0.1
 ```
 
 ## Usage
