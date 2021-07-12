@@ -3,9 +3,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("VERSION", "r") as vf:
+    VERSION = vf.read().strip()
+
 setuptools.setup(
     name="zju_hitcarder",
-    version="0.1.1",
+    version=VERSION,
     author="Tishacy",
     author_email="Tishacy@gmail.com",
     description="ZJU health hitcarder",
@@ -20,7 +23,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'hitcarder=hitcarder.run:main'
+            'hitcarder=hitcarder.cli:cli'
         ],
     },
     classifiers=(

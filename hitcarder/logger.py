@@ -13,8 +13,8 @@ def log_init(conf_fpath=None):
     package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     conf_fpath = conf_fpath or os.path.join(package_dir, 'config.json')
     if not os.path.exists(conf_fpath):
-        logger.error("No config file is found.")
-        return
+        logger.error("Cannot find the config file %s." % conf_fpath)
+        return False
     configs = json.loads(open(conf_fpath, 'r').read())
 
     log_config = configs.get('log', {})
@@ -28,3 +28,4 @@ def log_init(conf_fpath=None):
                enqueue=True,
                retention=log_config.get('retention'))
     logger.info("Logging initialized: %s" % log_fpath)
+    return True
