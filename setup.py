@@ -18,8 +18,9 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         'requests>=2.25.1',
-        'loguru>=0.5.3',
-        'APScheduler>=3.7.0'
+        'loguru>=0.5.0',
+        'APScheduler>=3.7.0',
+        "click>=8.0.1"
     ],
     entry_points={
         'console_scripts': [
