@@ -30,7 +30,7 @@
 使用 pip 安装即可
 
 ```bash
-$ pip install zju_hitcarder
+$ pip install -U zju_hitcarder
 ```
 
 查看是否安装成功
