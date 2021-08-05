@@ -96,6 +96,7 @@ class HitCarder(object):
             new_id = new_info_tmp['id']
             name = re.findall(r'realname: "([^\"]+)",', html)[0]
             number = re.findall(r"number: '([^\']+)',", html)[0]
+            encrypt_message = re.findall(r'"([a-f0-9]{32})": *"([^\"]+)",', html)
         except IndexError as err:
             self.status = "NO_CACHE"
             raise RegexMatchError('No hit card info is found in html with regex: ' + str(err))
@@ -104,6 +105,8 @@ class HitCarder(object):
             raise DecodeError('JSON decode error: ' + str(err))
 
         new_info = old_info.copy()
+        for i in encrypt_message:
+            new_info[i[0]] = i[1]
         new_info['id'] = new_id
         new_info['name'] = name
         new_info['number'] = number
