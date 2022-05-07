@@ -14,6 +14,7 @@ from loguru import logger
 
 from .utils import rsa_encrypt
 from .exception import LoginError, RegexMatchError, DecodeError
+import ddddocr
 
 
 class HitCarder(object):
@@ -117,6 +118,17 @@ class HitCarder(object):
         new_info['jcqzrq'] = ""
         new_info['gwszdd'] = ""
         new_info['szgjcs'] = ""
+        _captcha_url = 'https://healthreport.zju.edu.cn/ncov/wap/default/code'
+        ocr = ddddocr.DdddOcr()
+        sess = requests.session()
+        # 设置 cookie
+        cookie_dict = {'eai-sess': 'xxxxxxxxxxxxxxxxxxxxxxxxx'}
+        sess.cookies = requests.cookies.cookiejar_from_dict(cookie_dict)
+
+        resp = sess.get(_captcha_url)
+        captcha = ocr.classification(resp.content)
+        # print(captcha, 11111111111111111111111111111111111111111111)
+        new_info['verifyCode'] = captcha
         logger.info("%s Successfully get submit info." % self)
         self.info = new_info
         self.status = "GOT_INFO"
