@@ -1,6 +1,6 @@
 # ZJU-BatchHitcarder
 
- [![Pyversion](https://img.shields.io/badge/python-3.x-g)](https://pypi.org/project/qspider/) [![License: MIT](https://img.shields.io/badge/License-MIT-orange)](https://opensource.org/licenses/MIT)
+ [![Pyversion](https://img.shields.io/badge/python-3.x-g)](https://pypi.org/project/qspider/) [![License: MIT](https://img.shields.io/badge/License-MIT-orange)](https://opensource.org/licenses/MIT) [![Downloads](https://pepy.tech/badge/zju-hitcarder/month)](https://pepy.tech/project/zju-hitcarder)
 
  :sparkles:浙大健康打卡定时自动打卡脚本，简单易用
 
@@ -30,7 +30,7 @@
 使用 pip 安装即可
 
 ```bash
-$ pip install zju_hitcarder
+$ pip install -U zju_hitcarder
 ```
 
 查看是否安装成功

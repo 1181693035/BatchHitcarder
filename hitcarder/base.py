@@ -14,6 +14,7 @@ from loguru import logger
 
 from .utils import rsa_encrypt
 from .exception import LoginError, RegexMatchError, DecodeError
+import ddddocr
 
 
 class HitCarder(object):
@@ -96,6 +97,7 @@ class HitCarder(object):
             new_id = new_info_tmp['id']
             name = re.findall(r'realname: "([^\"]+)",', html)[0]
             number = re.findall(r"number: '([^\']+)',", html)[0]
+            encrypt_message = re.findall(r'"([a-f0-9]{32})": *"([^\"]+)",', html)
         except IndexError as err:
             self.status = "NO_CACHE"
             raise RegexMatchError('No hit card info is found in html with regex: ' + str(err))
@@ -104,6 +106,8 @@ class HitCarder(object):
             raise DecodeError('JSON decode error: ' + str(err))
 
         new_info = old_info.copy()
+        for i in encrypt_message:
+            new_info[i[0]] = i[1]
         new_info['id'] = new_id
         new_info['name'] = name
         new_info['number'] = number
@@ -114,6 +118,17 @@ class HitCarder(object):
         new_info['jcqzrq'] = ""
         new_info['gwszdd'] = ""
         new_info['szgjcs'] = ""
+        _captcha_url = 'https://healthreport.zju.edu.cn/ncov/wap/default/code'
+        ocr = ddddocr.DdddOcr()
+        # self.sess = requests.session()
+        # 设置 cookie
+        # cookie_dict = {'eai-sess': 'xxxxxxxxxxxxxxxxxxxxxxxxx'}
+        # self.sess.cookies = requests.cookies.cookiejar_from_dict(cookie_dict)
+
+        resp = self.sess.get(_captcha_url)
+        captcha = ocr.classification(resp.content)
+        # print(captcha, 11111111111111111111111111111111111111111111)
+        new_info['verifyCode'] = captcha
         logger.info("%s Successfully get submit info." % self)
         self.info = new_info
         self.status = "GOT_INFO"
