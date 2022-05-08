@@ -120,12 +120,12 @@ class HitCarder(object):
         new_info['szgjcs'] = ""
         _captcha_url = 'https://healthreport.zju.edu.cn/ncov/wap/default/code'
         ocr = ddddocr.DdddOcr()
-        sess = requests.session()
+        # self.sess = requests.session()
         # 设置 cookie
-        cookie_dict = {'eai-sess': 'xxxxxxxxxxxxxxxxxxxxxxxxx'}
-        sess.cookies = requests.cookies.cookiejar_from_dict(cookie_dict)
+        # cookie_dict = {'eai-sess': 'xxxxxxxxxxxxxxxxxxxxxxxxx'}
+        # self.sess.cookies = requests.cookies.cookiejar_from_dict(cookie_dict)
 
-        resp = sess.get(_captcha_url)
+        resp = self.sess.get(_captcha_url)
         captcha = ocr.classification(resp.content)
         # print(captcha, 11111111111111111111111111111111111111111111)
         new_info['verifyCode'] = captcha
